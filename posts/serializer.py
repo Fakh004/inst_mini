@@ -1,13 +1,10 @@
-# apps/posts/serializers.py
 from rest_framework import serializers
 from .models import Post, Follow, Like, Comment
 from account.models import User
 
 
 
-# -----------------------------------
-# Comment Serializer
-# -----------------------------------
+
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
 
@@ -16,9 +13,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'author', 'text', 'created_at']
 
 
-# -----------------------------------
-# Post Serializer
-# -----------------------------------
+
 class PostSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True) 
     likes_count = serializers.IntegerField(source='likes.count', read_only=True)
@@ -33,9 +28,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 
-# -----------------------------------
-# Follow Serializer
-# -----------------------------------
+
 class FollowSerializer(serializers.ModelSerializer):
     follower = serializers.StringRelatedField(read_only=True)
     following = serializers.PrimaryKeyRelatedField(
@@ -67,16 +60,13 @@ class FollowSerializer(serializers.ModelSerializer):
         )
 
         if not created:
-            # уже подписан → отписка
             follow.delete()
             return None
 
         return follow
 
 
-# -----------------------------------
-# Like Serializer
-# -----------------------------------
+
 class LikeSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
 
