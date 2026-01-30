@@ -7,9 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from account.pagination import CustomPagination
 from django.core.cache import cache 
 
-# -----------------------------------
-# Post Views
-# -----------------------------------
+
 
 class AllUserPostView(generics.ListAPIView):
     queryset = Post.objects.all()
@@ -60,9 +58,8 @@ class PostRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         instance.is_deleted = True
         instance.save()
 
-# -----------------------------------
-# Follow Views
-# -----------------------------------
+
+
 class FollowListCreateView(generics.ListCreateAPIView):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
@@ -129,9 +126,9 @@ class UnfollowDestroyView(generics.DestroyAPIView):
         following_id = self.kwargs['following_id']
         return Follow.objects.get(follower=self.request.user, following_id=following_id)
 
-# -----------------------------------
-# Like Views
-# -----------------------------------
+
+
+
 class LikeCreateDestroyView(generics.GenericAPIView):
     serializer_class = LikeSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -162,9 +159,8 @@ class LikeCreateDestroyView(generics.GenericAPIView):
             {"detail": "Лайк поставлен"},
             status=status.HTTP_201_CREATED
         )
-# -----------------------------------
-# Comment Views
-# -----------------------------------
+
+
 class CommentListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.filter(
         is_deleted=False
