@@ -8,7 +8,6 @@ from .models import User
 from .serializers import UserSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import ProfileSerializer
-from .pagination import CustomPagination 
 from django.core.cache import cache 
 
 
@@ -59,7 +58,6 @@ class AllUserProfileView(generics.ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
     parser_classes = [MultiPartParser, FormParser]
-    pagination_class = CustomPagination
 
 
     def get(self, request, *args, **kwargs):

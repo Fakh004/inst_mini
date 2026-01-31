@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from .models import Post, Follow, Like, Comment
 from .serializer import PostSerializer, FollowSerializer, LikeSerializer, CommentSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
-from account.pagination import CustomPagination
 from django.core.cache import cache 
 
 
@@ -12,7 +11,6 @@ class AllUserPostView(generics.ListAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
-    pagination_class = CustomPagination
 
     def get(self, request, *args, **kwargs):
         data = cache.get('My_list')
@@ -31,7 +29,6 @@ class PostListCreateView(generics.ListCreateAPIView):
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
-    pagination_class = CustomPagination
 
     def get(self, request, *args, **kwargs):
         data = cache.get('My_list')
