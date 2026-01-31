@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from .models import Post, Follow, Like, Comment
-from .serializer import PostSerializer, FollowSerializer, LikeSerializer, CommentSerializer
+from .models import *
+from .serializer import *
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.cache import cache 
 
