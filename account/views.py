@@ -9,12 +9,14 @@ from .serializers import UserSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import ProfileSerializer
 from django.core.cache import cache 
+from rest_framework import serializers
 
 
 # регистрация
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
+
 
 
 # выход (logout)

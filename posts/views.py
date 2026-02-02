@@ -1,10 +1,13 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from .models import Post, Follow, Like, Comment
-from .serializer import PostSerializer, FollowSerializer, LikeSerializer, CommentSerializer
+from .models import *
+from .serializer import *
 from rest_framework.parsers import MultiPartParser, FormParser
 from account.pagination import CustomPagination
 from django.core.cache import cache 
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
+from drf_yasg.utils import swagger_auto_schema
 
 
 
@@ -64,6 +67,7 @@ class FollowListCreateView(generics.ListCreateAPIView):
     serializer_class = FollowSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = CustomPagination
+
 
     def perform_create(self, serializer):
         serializer.save(follower=self.request.user)
@@ -159,24 +163,49 @@ class LikeCreateDestroyView(generics.GenericAPIView):
         )
 
 
-class CommentListCreateView(generics.ListCreateAPIView):
-    queryset = Post.objects.filter(
-        is_deleted=False
-    ).select_related(
-        'author'
-    ).prefetch_related(
-        'comments__author',
-        'likes'
-    )
-    serializer_class = PostSerializer
+class CommentCreateView(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, *args, **kwargs):
-        data = cache.get('My_list')
-        if not data:
-            serializer=self.get_serializer(self.get_queryset(),many=True)
-            data = serializer.data
-            cache.set('My_list',data,30)
-        return Response (data)
-    
+    def perform_create(self, serializer):
+        p_id = self.kwargs.get('post_id')
+        serializer.save(author=self.request.user, post_id=p_id)
 
 
+
+class SendMessageToUserView(generics.CreateAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        recipient_id = self.kwargs.get('recipient_id')
+        recipient = get_object_or_404(User, id=recipient_id)
+        me = self.request.user
+
+        if me == recipient:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError("Нельзя писать самому себе.")
+
+        chat = Chats.objects.filter(
+            (Q(user1=me) & Q(user2=recipient)) | 
+            (Q(user1=recipient) & Q(user2=me))
+        ).first()
+
+        if not chat:
+            chat = Chats.objects.create(
+                title=f"Чат {me.username} и {recipient.username}",
+                user1=me,
+                user2=recipient
+            )
+        serializer.save(sender=me, chat=chat)
+
+class ChatMessageListView(generics.ListAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        chat_id = self.kwargs.get('chat_id')
+        return Message.objects.filter(
+            Q(chat_id=chat_id) & (Q(chat__user1=self.request.user) | Q(chat__user2=self.request.user))
+        )

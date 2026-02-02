@@ -1,12 +1,6 @@
-# apps/posts/urls.py
 from django.urls import path
-from .views import (
-    PostListCreateView, PostRetrieveUpdateDestroyView,
-    FollowListCreateView, UnfollowDestroyView,
-    LikeCreateDestroyView,
-    CommentListCreateView,
-    AllUserPostView,
-)
+from .views import *
+from . import views 
 
 urlpatterns = [
     # Post URLs
@@ -22,5 +16,11 @@ urlpatterns = [
     path('posts/<int:post_id>/like/', LikeCreateDestroyView.as_view(), name='like-post'),  # поставить/снять лайк
  
     # Comment URLs
-    path('posts/<int:post_id>/comments/', CommentListCreateView.as_view(), name='post-comments'),  # список комментариев / создание комментария
+    path('posts/<int:post_id>/comments/', CommentCreateView.as_view(), name='post-comments'),  # список комментариев / создание комментария
+
+    # Chat URLs
+    path('messages/send-to/<int:recipient_id>/', SendMessageToUserView.as_view(), name='send-message'),
+
+    path('chats/<int:chat_id>/history/', ChatMessageListView.as_view(), name='chat-history'),
+
 ]

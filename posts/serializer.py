@@ -1,15 +1,15 @@
-# apps/posts/serializers.py
 from rest_framework import serializers
-from .models import Post, Follow, Like, Comment
+from .models import *
 from account.models import User
 
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Comment
-        fields = ['id', 'author', 'text', 'created_at']
+        fields = ['id', 'author', 'post', 'text', 'created_at']
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'author', 'title', 'content', 'image', 'created_at', 'updated_at', 'likes_count', 'comments_count',"comments"]
+        fields = ['id', 'author',  'content', 'image', 'created_at', 'updated_at', 'likes_count', 'comments_count',"comments"]
 
 
 
@@ -73,3 +73,20 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = ['id', 'user']
 
 
+class ChatSerializer(serializers.ModelSerializer):
+    user1 = serializers.StringRelatedField(read_only=True)
+    user2 = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Chats
+        fields = ['id', 'title', 'user1', 'user2', 'created_at']
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.ReadOnlyField(source='sender.first_name')
+    sender_username = serializers.ReadOnlyField(source='sender.username')
+    chat = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['id', 'chat', 'sender_username', 'sender_name', 'content']
