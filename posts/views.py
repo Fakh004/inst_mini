@@ -179,8 +179,8 @@ class SendMessageToUserView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        recipient_id = self.kwargs.get('recipient_id')
-        recipient = get_object_or_404(User, id=recipient_id)
+        polzvatel = self.kwargs.get('polzvatel')
+        recipient = get_object_or_404(User, id=polzvatel)
         me = self.request.user
 
         if me == recipient:
